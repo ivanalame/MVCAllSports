@@ -1,0 +1,85 @@
+﻿@model MVCAllSports.Models.Producto
+
+@{
+    ViewData["Title"] = "Modificar Producto";
+    var categorias = ViewData["CATEGORIAS"] as IEnumerable<CategoriaProduto>;
+}
+
+<h1 class="text-center mt-4 mb-4">Modificar Producto</h1>
+@if (categorias != null)
+{
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form asp-action="ModificarProducto" enctype="multipart/form-data" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <input type="hidden" name="IdProducto" value="@Model.IdProducto" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Nombre" class="control-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Precio" class="control-label"></label>
+                        <input asp-for="Precio" class="form-control" />
+                        <span asp-validation-for="Precio" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Marca" class="control-label"></label>
+                        <input asp-for="Marca" class="form-control" />
+                        <span asp-validation-for="Marca" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Descripcion" class="control-label"></label>
+                        <input asp-for="Descripcion" class="form-control" />
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Talla" class="control-label"></label>
+                        <select asp-for="Talla" class="form-control">
+                            <option value="">Seleccione una talla</option>
+                            <option value="1">S</option>
+                            <option value="2">M</option>
+                            <option value="3">L</option>
+                            <option value="4">XL</option>
+                        </select>
+                        <span asp-validation-for="Talla" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Imagen:</label>
+                        <input type="file" name="fichero" class="form-control" />
+                        <input type="hidden" name="ImagenAnterior" value="@Model.Imagen" />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="IdCategoriaProducto" class="control-label"></label>
+                        <select asp-for="IdCategoriaProducto" class="form-control">
+                            <option value="">Seleccione una categoría</option>
+                            @foreach (var categoria in categorias)
+                            {
+                                <option value="@categoria.IdCategoriaProducto">@categoria.Nombre</option>
+                            }
+                        </select>
+                        <span asp-validation-for="IdCategoriaProducto" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Descripcion_Larga" class="control-label"></label>
+                        <input asp-for="Descripcion_Larga" class="form-control" />
+                        <span asp-validation-for="Descripcion_Larga" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Update" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+

@@ -1,0 +1,139 @@
+﻿
+<script>
+    $(document).ready(function () {
+        $("#enviarValoracion").click(function () {
+            var formData = $("#valoracionForm").serialize();
+
+            $.ajax({
+                url: '/Deportes/_Valoraciones',
+                type: 'POST',
+                data: formData,
+                success: function (data) {
+                    
+                    
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                },
+                error: function () {
+                }
+            });
+        });
+    });
+</script>
+<style>
+    .form-container {
+        max-width: 400px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+    }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+    .rating {
+        unicode-bidi: bidi-override;
+        direction: rtl;
+    }
+
+        .rating > input {
+            display: none;
+        }
+
+        .rating > label {
+            display: inline-block;
+            padding: 5px;
+            font-size: 25px;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+            .rating > label:hover,
+            .rating > label:hover ~ label {
+                color: #ffd700;
+            }
+
+        .rating > input:checked ~ label {
+            color: #ffd700;
+        }
+
+            .rating > label:hover:before,
+            .rating > label:hover ~ label:before,
+            .rating > input:checked ~ label:before {
+                content: '\2605';
+                position: absolute;
+            }
+</style>
+<div class="form-container">
+    <h2>Introduce tu valoración</h2>
+    <form id="valoracionForm">
+        <input type="hidden" name="IdValoracion" class="form-control" />
+        <input type="hidden" value="@ViewData["IDUSUARIO"]" name="IdUsuario" class="form-control" />
+        <input type="hidden" value="@ViewData["IDPRODUCTO"]" name="IdProducto" class="form-control" />
+
+
+        <label for="comentario">Introduce un comentario:</label>
+        <input type="text" id="comentario" name="Comentario" class="form-control" />
+
+        <label for="puntuacion">Introduce una puntuación:</label>
+        <div class="rating">
+            <input type="radio" id="star10" name="Puntuacion" value="10">
+            <label for="star10">★</label>
+            <input type="radio" id="star9" name="Puntuacion" value="9">
+            <label for="star9">★</label>
+            <input type="radio" id="star8" name="Puntuacion" value="8">
+            <label for="star8">★</label>
+            <input type="radio" id="star7" name="Puntuacion" value="7">
+            <label for="star7">★</label>
+            <input type="radio" id="star6" name="Puntuacion" value="6">
+            <label for="star6">★</label>
+            <input type="radio" id="star5" name="Puntuacion" value="5">
+            <label for="star5">★</label>
+            <input type="radio" id="star4" name="Puntuacion" value="4">
+            <label for="star4">★</label>
+            <input type="radio" id="star3" name="Puntuacion" value="3">
+            <label for="star3">★</label>
+            <input type="radio" id="star2" name="Puntuacion" value="2">
+            <label for="star2">★</label>
+            <input type="radio" id="star1" name="Puntuacion" value="1">
+            <label for="star1">★</label>
+        </div>
+
+        <button type="button" id="enviarValoracion" class="btn btn-success">Enviar</button>
+    </form>
+    <h2> @ViewData["MENSAJE"]</h2>
+</div>

@@ -1,0 +1,114 @@
+﻿<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+    }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+    .error {
+        color: red;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .register-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+        .register-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+            .register-link a:hover {
+                text-decoration: underline;
+            }
+
+    .image-container {
+        text-align: center;
+    }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Iniciar Sesión</h2>
+
+            @if (ViewData["Mensaje"] != null)
+            {
+                <div class="error">@ViewData["Mensaje"]</div>
+            }
+
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+
+                <input type="submit" value="Iniciar Sesión">
+            </form>
+
+            <div class="register-link">
+                <p>¿No tienes cuenta? <a asp-action="Register" asp-controller="Deportes">Regístrate aquí</a></p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="image-container">
+                <img src="~/Images/DEPORTES.JPG" class="img-fluid" alt="Imagen de deportes">
+            </div>
+        </div>
+    </div>
+</div>

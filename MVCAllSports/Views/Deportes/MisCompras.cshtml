@@ -1,0 +1,70 @@
+﻿@model List<Compra>
+
+<h1 class="text-center mb-4">Compras del Usuario</h1>
+
+<style>
+    .wobble-horizontal-top .card-img-top {
+        transition: transform 0.8s ease-in-out;
+    }
+
+    .wobble-horizontal-top:hover .card-img-top {
+        transform: translateX(-15px) rotate(-5deg);
+    }
+
+    .card-custom:hover .title-text {
+        transform: translateY(-5px);
+        color: #2D31C4;
+    }
+
+    .card-custom:hover {
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .product-card {
+        transition: box-shadow 0.3s, transform 0.3s;
+    }
+
+        .product-card:hover {
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px);
+        }
+
+            .product-card:hover .card-title,
+            .product-card:hover .card-text {
+                color: #007F7F;
+            }
+</style>
+
+@if (Model != null && Model.Count > 0)
+{
+    <div class="row">
+        @foreach (var compra in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card product-card">
+                    <div class="card-body">
+                        <p class="card-text">Fecha de Compra: @compra.FechaCompra</p>
+                        <p class="card-text">Cantidad: @compra.Cantidad</p>
+                        @if (compra.Descuento != "DESCUENTAZO")
+                        {
+                            <p class="card-text">Descuento Usado: Ninguno</p>
+                        }
+                        else
+                        {
+                            <p class="card-text">Descuento Usado: @compra.Descuento -15%</p>
+                        }
+                        <p class="card-text">Dirección: @compra.Direccion</p>
+                        <p class="card-text">Método de pago: @compra.Metodo_Pago</p>
+                        <p class="card-text">Provincia: @compra.Provincia</p>
+                        <a class="btn btn-success" asp-action="DetalleMisCompras" asp-controller="deportes" asp-route-idproducto="@compra.IdProducto">Detalle</a>
+                    </div>
+                </div>
+            </div>
+        }
+        <div id="contenidodetalle"></div>
+    </div>
+}
+else
+{
+    <p class="text-center">No hay compras realizadas por este usuario.</p>
+}

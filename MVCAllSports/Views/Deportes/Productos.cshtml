@@ -1,0 +1,133 @@
+﻿@model List<Producto>
+@{
+    List<int> idsproductos = Context.Session.GetObject<List<int>>("IDSPRODUCTOS");
+    string rutaContainer = ViewData["RutaContainer"] as string;
+    int idrole = 2;
+    if (ViewData["USERROLE"] != null)
+    {
+        idrole = (int)ViewData["USERROLE"];
+    }
+
+}
+<style>
+
+    .wobble-horizontal-top .card-img-top {
+        transition: transform 0.8s ease-in-out;
+    }
+
+   
+    .wobble-horizontal-top:hover .card-img-top {
+        transform: translateX(-15px) rotate(-5deg);
+    }
+
+    .card-custom:hover .title-text {
+        transform: translateY(-5px);
+        color: #2D31C4;
+    }
+
+    .card-custom:hover {
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .product-card {
+        transition: box-shadow 0.3s, transform 0.3s;
+    }
+
+        .product-card:hover {
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px);
+        }
+
+            .product-card:hover .card-title,
+            .product-card:hover .card-text {
+                color: #007F7F;
+            }
+</style>
+
+<script>
+    document.querySelectorAll('.product-card').forEach(item => {
+        item.addEventListener('mouseover', () => {
+            item.querySelector('.card-img-top').classList.add('wobble-horizontal-top');
+        });
+
+        item.addEventListener('mouseout', () => {
+            item.querySelector('.card-img-top').classList.remove('wobble-horizontal-top');
+        });
+    });
+</script>
+
+
+@if (Model != null)
+{
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card p-3 shadow">
+                    <label for="deporteSelect" class="form-label">Productos:</label>
+                    <div class="container">
+                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                            @foreach (var producto in Model)
+                            {
+                                <div class="col mb-4 product-card">
+                                    <div class="card p-4 shadow bg-light">
+                                        @if (producto.Imagen != null)
+                                        {
+                                            <img src="@rutaContainer/@producto.Imagen" class="card-img-top w-100 mx-auto d-block" alt="@producto.Nombre">
+                                        }
+                                        <div class="card-body">
+                                            <h5 class="card-title">@producto.Nombre</h5>
+                                            <p class="card-text">@producto.Descripcion</p>
+                                            <p class="card-text">Precio: @producto.Precio,00€</p>
+                                            <a asp-controller="Deportes" asp-action="DetailProducto" asp-route-IdProducto="@producto.IdProducto" class="btn btn-primary">Mas Info</a>
+                                            @if (idsproductos == null)
+                                            {
+                                                <a class="btn btn-info" asp-controller="Deportes"
+                                                   asp-action="Productos"
+                                                   asp-route-idProducto="@producto.IdProducto"
+                                                   asp-route-IdCategoriaProducto="@producto.IdCategoriaProducto"
+                                                   asp-route-precio="@producto.Precio">
+
+                                                    Agreagar al carrito
+
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                if (idsproductos.Contains(producto.IdProducto))
+                                                {
+                                                    <h4 style="color:deepskyblue">Este producto ya lo tienes en el carrito</h4>
+                                                }
+                                                else
+                                                {
+                                                    <a class="btn btn-info" asp-controller="Deportes"
+                                                       asp-action="Productos"
+                                                       asp-route-idProducto="@producto.IdProducto"
+                                                       asp-route-IdCategoriaProducto="@producto.IdCategoriaProducto"
+                                                       asp-route-precio="@producto.Precio">
+                                                        Agreagar al carritio
+
+                                                    </a>
+                                                }
+                                            }
+                                            <a asp-action="Compra" asp-controller="Deportes" asp-route-id="@producto.IdProducto" class="btn btn-success pt-2 mt-2">Comprar</a>
+                                            @if (idrole == 1)
+                                            {
+
+                                                <a asp-action="ModificarProducto" asp-controller="Deportes" asp-route-idproducto="@producto.IdProducto" class="btn btn-warning pt-2 mt-2">Modificar</a>
+
+
+                                                <a asp-action="EliminarProducto" asp-controller="Deportes" asp-route-idproducto="@producto.IdProducto" class="btn btn-danger pt-2 mt-2">Eliminar</a>
+
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

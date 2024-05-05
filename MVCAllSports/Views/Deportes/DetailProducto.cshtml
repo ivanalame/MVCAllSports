@@ -1,0 +1,147 @@
+﻿@model List<ValoracionConNombreUsuario>
+@{
+    Producto producto = ViewData["Producto"] as Producto;
+    List<int> idsproductos = Context.Session.GetObject<List<int>>("IDSPRODUCTOS");
+    string rutaContainer = ViewData["RutaContainer"] as string;
+}
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#botonloadvaloraciones").click(function () {
+                var idProducto = @producto.IdProducto;
+                $.ajax({
+                    url: '/Deportes/_Valoraciones',
+                    type: 'GET', // O 'POST' según lo que necesites
+                    data: { idProducto: idProducto },
+                    success: function (response) {
+                        $("#contenidovaloraciones").html(response);
+                    },
+                    error: function () {
+                        console.error("Error al cargar _Valoraciones");
+                    }
+                });
+            });
+        });
+
+
+
+        $(document).ready(function () {
+            $('.card').hover(function () {
+                $(this).css({
+                    'transform': 'scale(1.05)',
+                    'box-shadow': '0 0 20px rgba(0,0,0,0.2)'
+                });
+            }, function () {
+                $(this).css({
+                    'transform': 'scale(1)',
+                    'box-shadow': 'none'
+                });
+            });
+        });
+    </script>
+}
+
+
+@if (producto != null)
+{
+    <div class="row">
+        <div class="col-md-4">
+            <img src="@rutaContainer/@producto.Imagen" class="w-100" />
+        </div>
+        <div class="col-md-8">
+            <h2>Información del Producto</h2>
+            <p><strong>Marca:</strong> @producto.Marca</p>
+            <p><strong>Nombre:</strong> @producto.Nombre</p>
+            <p><strong>Descripción:</strong> @producto.Descripcion</p>
+            <p><strong>Precio:</strong> @producto.Precio,00€</p>
+            <p><strong>Descripción Larga:</strong> @producto.Descripcion_Larga</p>
+
+            @if (idsproductos == null)
+            {
+                <a class="btn btn-info" asp-controller="Deportes"
+                   asp-action="DetailProducto"
+                   asp-route-idProducto="@producto.IdProducto">
+
+                    Agregar al carrito
+
+                </a>
+            }
+            else
+            {
+                if (idsproductos.Contains(producto.IdProducto))
+                {
+                    <h4 style="color:deepskyblue">Este producto ya lo tienes en el carrito</h4>
+                }
+                else
+                {
+                    <a class="btn btn-info" asp-controller="Deportes"
+                       asp-action="DetailProducto"
+                       asp-route-idProducto="@producto.IdProducto">
+
+                        Agregar al carrito
+
+                    </a>
+                }
+            }
+
+            <a asp-action="Compra" asp-controller="Deportes" asp-route-id="@producto.IdProducto" class="btn btn-success pt-2 mt-2">Comprar</a>
+        </div>
+
+    </div>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <button id="botonloadvaloraciones" class="btn btn-success">Valorar Producto</button>
+    }
+    else
+    {
+        <div class="alert alert-warning mt-3" role="alert">
+            <h4 class="alert-heading">¡Atención!</h4>
+            <p class="mb-0">Para valorar el producto, por favor inicie sesión.</p>
+        </div>
+    }
+
+    <div id="contenidovaloraciones" style="background-color: lightgreen"></div>
+}
+
+@if (Model != null && Model.Count > 0)
+{
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h2>Valoraciones</h2>
+            <ul class="list-inline">
+                @foreach (var valoracion in Model)
+                {
+                    <li class="list-inline-item">
+                        <div class="card border-dark mb-3" style="width: 25rem; transition: all 0.3s ease;">
+                            <div class="card-body">
+                                <h5 class="card-title">Usuario: @valoracion.NombreUsuario</h5>
+                                <p class="card-text">
+                                    Valoración:
+                                    @for (int i = 1; i <= 10; i++)
+                                    {
+                                        if (i <= valoracion.Puntuacion)
+                                        {
+                                            <span>&#9733;</span>
+                                        }
+                                        else
+                                        {
+                                            <span>&#9734;</span>
+                                        }
+                                    }
+                                </p>
+                                <p class="card-text">Comentario: @valoracion.Comentario</p>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+}
+else
+{
+    <p>No hay valoraciones para este producto.</p>
+}
+

@@ -1,0 +1,68 @@
+﻿@model List<Deporte>
+@{
+     List<int> idsproductos =
+     Context.Session.GetObject<List<int>>("IDSPRODUCTOS");
+    int idrole = 2;
+    if (ViewData["USERROLE"] != null)
+    {
+        idrole = (int)ViewData["USERROLE"];
+    }
+}
+<style>
+    .bg-image-navbar {
+        background-image: url('/images/Surf.JPG');
+        background-size: cover;
+    }
+</style>
+<div class="container bg-image-navbar">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav flex-grow-1">
+                    @foreach (var deporte in Model)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-action="DetalleDeporte" asp-controller="Deportes" asp-route-IdDeporte="@deporte.IdDeporte">@deporte.Nombre </a>
+                        </li>
+                    }
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="deportes" asp-action="index">Home AllSports</a>
+            </li>
+            @if (idrole==1)
+            {
+                 <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="deportes" asp-action="insertproducto">Insertar Producto</a>
+            </li>
+            }
+
+            @if (Context.User.Identity.IsAuthenticated)
+            {
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Deportes" asp-action="MisCompras">
+                       Mis Compras
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Deportes" asp-action="PerfilUsuario">
+                       Mi perfil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Managed" asp-action="Logout">
+                      Log out <span style="color:blue">@Context.User.Identity.Name</span>
+                    </a>
+                </li>
+               
+            }
+           
+                </ul>
+
+               
+            </div>
+        </div>
+
+
+
+

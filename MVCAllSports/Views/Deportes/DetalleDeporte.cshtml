@@ -1,0 +1,41 @@
+﻿@model List<DetalleDeporte>
+
+<style>
+    .fondo {
+        background-color: #0d9cc4;
+        transition: transform 0.3s ease;
+    }
+
+        .fondo:hover {
+            transform: translateY(-5px);
+        }
+</style>
+
+@if (@Model != null)
+{
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card p-3 shadow">
+                    <label for="deporteSelect" class="form-label">Deportes: </label>
+                    <div class="container">
+                        <div class="row">
+                            @foreach (var Deporte in Model)
+                            {
+                                <div class="col-md-2 mb-3">
+                                    
+                                    <a asp-action="CategoriasProducto" asp-controller="Deportes" asp-route-IdDetalleDeporte="@Deporte.IdDetalleDeporte">
+                                        <div class="fondo card p-4 shadow text-white">
+                                           
+                                            <label class="form-label">@Deporte.Nombre</label>
+                                        </div>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
