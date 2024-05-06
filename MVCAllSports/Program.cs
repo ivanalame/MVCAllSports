@@ -10,10 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews(options => options.EnableEndpointRouting = false).AddSessionStateTempDataProvider();
 builder.Services.AddSession();
-builder.Services.AddSingleton<HelperPathProvider>();
+//builder.Services.AddSingleton<HelperPathProvider>();
 builder.Services.AddSingleton<HelperMails>();
-builder.Services.AddSingleton<HelperUploadFiles>();
-builder.Services.AddSingleton<HelperCryptography>();
+//builder.Services.AddSingleton<HelperUploadFiles>();
+//builder.Services.AddSingleton<HelperCryptography>();
 builder.Services.AddTransient<ServiceDeportes>();
 builder.Services.AddAuthentication(options =>
 {

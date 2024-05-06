@@ -15,15 +15,15 @@ namespace MVCAllSports.Controllers
     {
         private ServiceDeportes service;
         private HelperMails helperMail;
-        private HelperUploadFiles helperUploadFiles;
+        //private HelperUploadFiles helperUploadFiles;
         private TelemetryClient telemetryClient;
 
-        public DeportesController(ServiceDeportes service,HelperMails helperMails,HelperUploadFiles helperUploadFiles,TelemetryClient telemetryClient)
+        public DeportesController(ServiceDeportes service,HelperMails helperMails,/*HelperUploadFiles helperUploadFiles,*/TelemetryClient telemetryClient)
         {
             this.service = service;
             this.telemetryClient = telemetryClient;
             this.helperMail = helperMails;
-            this.helperUploadFiles = helperUploadFiles;
+           // this.helperUploadFiles = helperUploadFiles;
         }
 
         #region PRINCIPAL
@@ -171,7 +171,7 @@ namespace MVCAllSports.Controllers
         {
             if (fichero != null)
             {
-                await this.helperUploadFiles.UploadFileAsync(fichero, Folders.Images);
+                //await this.helperUploadFiles.UploadFileAsync(fichero, Folders.Images);
                 producto.Imagen = fichero.FileName;
                 await this.service.UpdateProductoAsync(producto.IdProducto, producto.Nombre, producto.Precio, producto.Marca, producto.Descripcion, producto.Talla, producto.Imagen, producto.IdCategoriaProducto, producto.Descripcion_Larga);
             }
@@ -340,7 +340,7 @@ namespace MVCAllSports.Controllers
         {
             if (fichero != null)
             {
-                await this.helperUploadFiles.UploadFileAsync(fichero, Folders.Images);
+                //await this.helperUploadFiles.UploadFileAsync(fichero, Folders.Images);
 
                 producto.Imagen = fichero.FileName;
                 await this.service.InsertProductoAsync(producto.Nombre, producto.Precio, producto.Marca, producto.Descripcion, producto.Talla, producto.Imagen, producto.IdCategoriaProducto, producto.Descripcion_Larga);

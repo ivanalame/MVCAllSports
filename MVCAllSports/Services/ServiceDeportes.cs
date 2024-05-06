@@ -21,16 +21,16 @@ namespace MVCAllSports.Services
     {
         private string UrlApi;
         private MediaTypeWithQualityHeaderValue header;
-        private HelperCryptography helper;
+        //private HelperCryptography helper;
         private IDatabase database;
         private BlobServiceClient client;
         private IHttpContextAccessor httpContextAccessor;
 
-        public ServiceDeportes(IConfiguration configuration, IHttpContextAccessor httpContextAccessor,HelperCryptography helper, BlobServiceClient client)
+        public ServiceDeportes(IConfiguration configuration, IHttpContextAccessor httpContextAccessor,/*HelperCryptography helper*/ BlobServiceClient client)
         {
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
             this.UrlApi = configuration.GetValue<string>("ApiUrls:ApiAllSports");
-            this.helper = helper;
+            //this.helper = helper;
             this.httpContextAccessor = httpContextAccessor;
             this.client = client;
             this.database = HelperCacheMultiplexer.Connection.GetDatabase();
