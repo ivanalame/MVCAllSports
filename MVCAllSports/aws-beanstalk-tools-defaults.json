@@ -1,0 +1,20 @@
+
+{
+    "region" : "us-east-1",
+    "configuration" : "Debug",
+    "framework"     : "net7.0",
+    "self-contained" : true,
+    "application"    : "MVCAllSports",
+    "environment"    : "MVCAllSports-2",
+    "enable-xray"    : false,
+    "enhanced-health-type" : "basic",
+    "additional-options"   : "\"aws:autoscaling:launchconfiguration,SecurityGroups\"=\"sg-0ce7d961db191d2db\";\"aws:ec2:vpc,Subnets\"=\"subnet-0f8c5cc6fab503d1e\"",
+    "solution-stack"       : "64bit Amazon Linux 2 v2.7.2 running .NET Core",
+    "environment-type"     : "SingleInstance",
+    "cname"                : "mvcallsports-2",
+    "instance-type"        : "t2.micro",
+    "key-pair"             : "keys-linux-web-server",
+    "instance-profile"     : "role-ec2-to-s3",
+    "service-role"         : "aws-elasticbeanstalk-service-role",
+    "proxy-server"         : "nginx"
+}
