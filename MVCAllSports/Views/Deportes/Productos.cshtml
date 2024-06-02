@@ -1,5 +1,6 @@
 ﻿@model List<Producto>
 @{
+    string UrlBucket = keysModel.BucketUrl;
     List<int> idsproductos = Context.Session.GetObject<List<int>>("IDSPRODUCTOS");
     string rutaContainer = ViewData["RutaContainer"] as string;
     int idrole = 2;
@@ -72,7 +73,7 @@
                                     <div class="card p-4 shadow bg-light">
                                         @if (producto.Imagen != null)
                                         {
-                                            <img src="@rutaContainer/@producto.Imagen" class="card-img-top w-100 mx-auto d-block" alt="@producto.Nombre">
+                                            <img src="@UrlBucket@producto.Imagen" class="card-img-top w-100 mx-auto d-block" alt="@producto.Nombre">
                                         }
                                         <div class="card-body">
                                             <h5 class="card-title">@producto.Nombre</h5>

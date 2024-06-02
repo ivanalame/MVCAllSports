@@ -1,9 +1,14 @@
 using AllSports.Helpers;
+using Amazon.S3;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Storage.Blobs;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Azure;
+using MVCAllSports.Helpers;
+using MVCAllSports.Models;
 using MVCAllSports.Services;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +17,7 @@ builder.Services.AddControllersWithViews(options => options.EnableEndpointRoutin
 builder.Services.AddSession();
 //builder.Services.AddSingleton<HelperPathProvider>();
 builder.Services.AddSingleton<HelperMails>();
+
 //builder.Services.AddSingleton<HelperUploadFiles>();
 //builder.Services.AddSingleton<HelperCryptography>();
 builder.Services.AddTransient<ServiceDeportes>();
@@ -23,6 +29,27 @@ builder.Services.AddAuthentication(options =>
 }).AddCookie();
 builder.Services.AddControllersWithViews (options => options.EnableEndpointRouting = false);
 builder.Services.AddHttpContextAccessor();
+
+string jsonSecrets = await
+
+    HelperSecretManager.GetSecretsAsync();
+
+builder.Services.AddAWSService<IAmazonS3>();
+
+KeysModel keysModel =
+
+    JsonConvert.DeserializeObject<KeysModel>(jsonSecrets);
+
+builder.Services.AddSingleton<KeysModel>(x => keysModel);
+builder.Services.AddTransient<ServiceStorageAWS>();
+builder.Services.AddTransient <ServiceAWSCache>();
+
+string connectionCache = keysModel.CacheRedis;
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = connectionCache;
+    options.InstanceName = "cache-allsports";
+});
 
 
 builder.Services.AddAzureClients(factory =>

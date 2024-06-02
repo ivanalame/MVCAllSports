@@ -14,16 +14,20 @@ namespace MVCAllSports.Controllers
     public class DeportesController : Controller
     {
         private ServiceDeportes service;
+        private ServiceStorageAWS serviceStorage;
+        private ServiceAWSCache serviceCache;
         private HelperMails helperMail;
         //private HelperUploadFiles helperUploadFiles;
         private TelemetryClient telemetryClient;
 
-        public DeportesController(ServiceDeportes service,HelperMails helperMails,/*HelperUploadFiles helperUploadFiles,*/TelemetryClient telemetryClient)
+        public DeportesController(ServiceDeportes service,HelperMails helperMails,/*HelperUploadFiles helperUploadFiles,*/TelemetryClient telemetryClient,ServiceStorageAWS serviceStorage,ServiceAWSCache serviceAWSCache)
         {
             this.service = service;
             this.telemetryClient = telemetryClient;
             this.helperMail = helperMails;
-           // this.helperUploadFiles = helperUploadFiles;
+            // this.helperUploadFiles = helperUploadFiles;
+            this.serviceCache = serviceAWSCache;
+            this.serviceStorage = serviceStorage;
         }
 
         #region PRINCIPAL
@@ -43,7 +47,7 @@ namespace MVCAllSports.Controllers
                 HttpContext.Session.SetString("SUMAPRECIOS", sumaPrecios.ToString());
 
                 Producto producto = await this.service.GetProductoByIdAsync(idProducto.Value);
-                await this.service.AddProductoCarritoAsync(producto);
+                await this.serviceCache.AddProductosFavoritosAsynct(producto);
                 ViewData["MENSAJE"] = "Producto almacenado en el carrito";
 
                 if (HttpContext.Session.GetString("IDSPRODUCTOS") == null)
@@ -119,7 +123,7 @@ namespace MVCAllSports.Controllers
                 HttpContext.Session.SetString("SUMAPRECIOS", sumaPrecios.ToString());
 
                 Producto producto = await this.service.GetProductoByIdAsync(idProducto.Value);
-                await this.service.AddProductoCarritoAsync(producto);
+                await this.serviceCache.AddProductosFavoritosAsynct(producto);
                 ViewData["MENSAJE"] = "Producto almacenado en el carrito";
                 if (HttpContext.Session.GetString("IDSPRODUCTOS") == null)
                 {
@@ -192,7 +196,7 @@ namespace MVCAllSports.Controllers
             if (!primerAcceso)
             {
                 Producto productoCarrito = await this.service.GetProductoByIdAsync(IdProducto);
-                await this.service.AddProductoCarritoAsync(productoCarrito);
+                await this.serviceCache.AddProductosFavoritosAsynct(productoCarrito);
                 ViewData["MENSAJE"] = "Producto almacenado en el carrito";
                 // Bloque de código que se ejecutará solo en el primer acceso
                 List<int> idsProductos;
@@ -338,11 +342,14 @@ namespace MVCAllSports.Controllers
         [HttpPost]
         public async Task<IActionResult> InsertProducto(Producto producto, IFormFile fichero)
         {
+            producto.Imagen = fichero.FileName;
             if (fichero != null)
             {
-                //await this.helperUploadFiles.UploadFileAsync(fichero, Folders.Images);
+                using(Stream stream = fichero.OpenReadStream())
+                {
+                    await this.serviceStorage.UploadFileAsync(fichero.FileName,stream );
+                }               
 
-                producto.Imagen = fichero.FileName;
                 await this.service.InsertProductoAsync(producto.Nombre, producto.Precio, producto.Marca, producto.Descripcion, producto.Talla, producto.Imagen, producto.IdCategoriaProducto, producto.Descripcion_Larga);
             }
             else
@@ -377,7 +384,7 @@ namespace MVCAllSports.Controllers
         [AuthorizeUsuarios]
         public async Task<IActionResult> Favoritos(int? ideliminar)
         {
-            List<Producto> productos = await this.service.GetProductosCarritoAsync();
+            List<Producto> productos = await this.serviceCache.GetProductosFavoritosAsync();
             List<int> idsProductos = HttpContext.Session.GetObject<List<int>>("IDSPRODUCTOS");
 
             if (productos == null)
@@ -392,7 +399,7 @@ namespace MVCAllSports.Controllers
             {
                 if (ideliminar != null)
                 {
-                    await this.service.DeleteProductoCarritoAsync(ideliminar.Value);
+                    await this.serviceCache.DeleteProductosFavoritosAsync(ideliminar.Value);
                     return RedirectToAction("Favoritos");
                 }
             }
