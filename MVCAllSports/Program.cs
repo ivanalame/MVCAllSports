@@ -36,7 +36,7 @@ KeysModel keysModel =
 
 builder.Services.AddSingleton<KeysModel>(x => keysModel);
 builder.Services.AddTransient<ServiceStorageAWS>();
-builder.Services.AddTransient <ServiceAWSCache>();
+
 
 string connectionCache = keysModel.CacheRedis;
 builder.Services.AddStackExchangeRedisCache(options =>

@@ -1,19 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
+﻿
 using MVCAllSports.Models;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Text.RegularExpressions;
-using System;
 using Newtonsoft.Json.Linq;
 using AllSports.Helpers;
-//using Azure.Storage.Blobs;
-using StackExchange.Redis;
-using MVCAllSports.Helpers;
 
-//using Azure.Security.KeyVault.Secrets;
+using Microsoft.Extensions.Caching.Distributed;
+
 
 namespace MVCAllSports.Services
 {
@@ -21,20 +15,18 @@ namespace MVCAllSports.Services
     {
         private string UrlApi;
         private MediaTypeWithQualityHeaderValue header;
-  
-        private IDatabase database;
+
+        private IDistributedCache cache;
      
         private IHttpContextAccessor httpContextAccessor;
 
-        public ServiceDeportes(IConfiguration configuration, IHttpContextAccessor httpContextAccessor,KeysModel keys)
+        public ServiceDeportes(IHttpContextAccessor httpContextAccessor,KeysModel keys,IDistributedCache cache)
         {
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
             this.UrlApi = keys.ApiAllSports;
-           
+           this.cache = cache;
             this.httpContextAccessor = httpContextAccessor;
-          
-            this.database = HelperCacheMultiplexer.Connection.GetDatabase();
-
+                
         }
 
         private async Task<T> CallApiAsync<T>(string request)
@@ -459,69 +451,80 @@ namespace MVCAllSports.Services
         }
         #endregion
 
-        #region AZURE
-        //METODO PARA OBTENER LA RUTA DE MI CONTAINER
-        //public async Task<string> GetContainerPathAsync()
-        //{
-        //    BlobContainerClient containerClient = this.client.GetBlobContainerClient("allsports");
-        //    return containerClient.Uri.ToString();
-        //}
-        #endregion
-        #region CACHE REDIS
-        //METODO PARA ALMACENAR EN EL CARRO LOS PRODUCTOS
-        public async Task AddProductoCarritoAsync(Producto producto)
-        {
-            string jsonProductos = await this.database.StringGetAsync("favoritos");
-            List<Producto> productosList;
-            if (jsonProductos == null)
-            {
-                //NO TENEMOS NADA EN EL CARRITO, LO CREAMOS
-                productosList = new List<Producto>();
-            }
-            else
-            {
-                //YA TENEMOS PRODUCTOS Y LOS RECUPERAMOS
-                productosList = JsonConvert.DeserializeObject<List<Producto>>(jsonProductos);
-            }
-            productosList.Add(producto);
-            jsonProductos = JsonConvert.SerializeObject(productosList);
-            await this.database.StringSetAsync("favoritos", jsonProductos);
-        }
 
-        //METODO PARA RECUPERAR LOS PRODUCTOS
-        public async Task <List<Producto>> GetProductosCarritoAsync()
+        #region CACHE REDIS
+        public async Task<List<Producto>> GetProductosFavoritosAsync()
         {
-            string jsonProductos = await this.database.StringGetAsync("favoritos");
-            if(jsonProductos == null)
+            //ALMACENAREMOS UNA COLECCION DE COCHES EN FORMATO JSON
+            //LAS KEYS DEBEN SER UNICAS PARA CADA USER
+            string jsonproductos =
+                await this.cache.GetStringAsync("productosfavoritos");
+            if (jsonproductos == null)
             {
                 return null;
             }
             else
             {
-                List<Producto> favoritos = JsonConvert.DeserializeObject<List<Producto>>(jsonProductos);
-                return favoritos;
+                List<Producto> cars = JsonConvert.DeserializeObject<List<Producto>>(jsonproductos);
+                return cars;
             }
         }
-        //METODO PARA ELIMINAR PRODUCTO
-        public async Task DeleteProductoCarritoAsync(int idproducto)
-        {
-            List<Producto> favoritos = await this.GetProductosCarritoAsync();
-            if (favoritos !=null)
-            {
-                Producto productoDelete = favoritos.FirstOrDefault(x=>x.IdProducto== idproducto);
-                favoritos.Remove(productoDelete);
 
-                if(favoritos.Count == 0)
+        public async Task AddProductosFavoritosAsynct(Producto pro)
+        {
+            List<Producto> productos = await this.GetProductosFavoritosAsync();
+            //SI NO EXISTEN COCHES FAVORITOS TODAVIA, CREAMOS 
+            //LA COLECCION
+            if (productos == null)
+            {
+                productos = new List<Producto>();
+            }
+            //AÑADIMOS EL NUEVO COCHE A LA COLECCION
+            productos.Add(pro);
+            //SERIALIZAMOS A JSON LA COLECCION
+            string jsonproductos = JsonConvert.SerializeObject(productos);
+            DistributedCacheEntryOptions options =
+                new DistributedCacheEntryOptions
                 {
-                    await this.database.KeyDeleteAsync("favoritos");
+                    SlidingExpiration = TimeSpan.FromMinutes(30)
+                };
+            //ALMACENAMOS LA COLECCION DENTRO DE CACHE REDIS
+            //INDICAREMOS QUE LOS DATOS DURARAN 30 MINUTOS
+            await this.cache.SetStringAsync("productosfavoritos"
+                , jsonproductos, options);
+        }
+
+        public async Task DeleteProductosFavoritosAsync(int idproducto)
+        {
+            List<Producto> cars = await this.GetProductosFavoritosAsync();
+            if (cars != null)
+            {
+                Producto productoEliminar =
+                    cars.FirstOrDefault(x => x.IdProducto == idproducto);
+                cars.Remove(productoEliminar);
+                //COMPROBAMOS SI LA COLECCION TIENE COCHES FAVORITOS
+                //TODAVIA O NO TIENE
+                //SI NO TENEMOS COCHES, ELIMINAMOS LA KEY DE CACHE REDIS
+                if (cars.Count == 0)
+                {
+                    await this.cache.RemoveAsync("productosfavoritos");
                 }
                 else
                 {
-                    string jsonProductos = JsonConvert.SerializeObject(favoritos);
-                    await this.database.StringSetAsync("favoritos",jsonProductos,TimeSpan.FromMinutes(30));
+                    //ALMACENAMOS DE NUEVO LOS COCHES SIN EL CAR ELIMINADO
+                    string jsonproductos = JsonConvert.SerializeObject(cars);
+                    DistributedCacheEntryOptions options =
+                        new DistributedCacheEntryOptions
+                        {
+                            SlidingExpiration = TimeSpan.FromMinutes(30)
+                        };
+                    //ACTUALIZAMOS EL CACHE REDIS
+                    await this.cache.SetStringAsync("productosfavoritos", jsonproductos
+                        , options);
                 }
             }
         }
-        #endregion
     }
 }
+
+        #endregion
