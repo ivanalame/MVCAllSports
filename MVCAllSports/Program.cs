@@ -8,36 +8,17 @@ using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews(options => options.EnableEndpointRouting = false).AddSessionStateTempDataProvider();
-builder.Services.AddSession();
+// Cargar secretos desde el administrador de secretos
+string jsonSecrets = await HelperSecretManager.GetSecretsAsync();
+KeysModel keysModel = JsonConvert.DeserializeObject<KeysModel>(jsonSecrets);
 
-builder.Services.AddSingleton<HelperMails>();
-
-builder.Services.AddTransient<ServiceDeportes>();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme =CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme =CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-}).AddCookie();
-builder.Services.AddControllersWithViews (options => options.EnableEndpointRouting = false);
-builder.Services.AddHttpContextAccessor();
-
-string jsonSecrets = await
-
-    HelperSecretManager.GetSecretsAsync();
-
+// Configurar servicios de AWS y S3
 builder.Services.AddAWSService<IAmazonS3>();
 
-KeysModel keysModel =
-
-    JsonConvert.DeserializeObject<KeysModel>(jsonSecrets);
-
+// Registrar KeysModel como un singleton
 builder.Services.AddSingleton<KeysModel>(x => keysModel);
-builder.Services.AddTransient<ServiceStorageAWS>();
 
-
+// Configurar Redis Cache
 string connectionCache = keysModel.CacheRedis;
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -45,6 +26,28 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "cache-allsports";
 });
 
+// Configurar servicios de controlador con soporte para el estado de la sesión
+builder.Services.AddControllersWithViews(options => options.EnableEndpointRouting = false)
+                .AddSessionStateTempDataProvider();
+
+// Configurar sesión
+builder.Services.AddSession();
+
+// Registrar servicios personalizados
+builder.Services.AddSingleton<HelperMails>();
+builder.Services.AddTransient<ServiceStorageAWS>();
+builder.Services.AddTransient<ServiceDeportes>();
+
+// Configurar autenticación con cookies
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie();
+
+// Añadir soporte para HttpContextAccessor
+builder.Services.AddHttpContextAccessor();
 
 
 var app = builder.Build();
