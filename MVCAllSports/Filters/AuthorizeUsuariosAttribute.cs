@@ -7,7 +7,7 @@ namespace MVCAllSports.Filters
 {
     public class AuthorizeUsuariosAttribute : AuthorizeAttribute, IAuthorizationFilter
     {
-        public void OnAuthorization(AuthorizationFilterContext context)
+        public   void OnAuthorization(AuthorizationFilterContext context)
         {
            var user = context.HttpContext.User;
             string controller = context.RouteData.Values["controller"].ToString();

@@ -1,10 +1,6 @@
 using AllSports.Helpers;
 using Amazon.S3;
-using Azure.Security.KeyVault.Secrets;
-using Azure.Storage.Blobs;
-
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.Azure;
 using MVCAllSports.Helpers;
 using MVCAllSports.Models;
 using MVCAllSports.Services;
@@ -15,11 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews(options => options.EnableEndpointRouting = false).AddSessionStateTempDataProvider();
 builder.Services.AddSession();
-//builder.Services.AddSingleton<HelperPathProvider>();
-builder.Services.AddSingleton<HelperMails>();
 
-//builder.Services.AddSingleton<HelperUploadFiles>();
-//builder.Services.AddSingleton<HelperCryptography>();
+builder.Services.AddSingleton<HelperMails>();
+builder.Services.AddSingleton<HelperCacheMultiplexer>();
+
+
 builder.Services.AddTransient<ServiceDeportes>();
 builder.Services.AddAuthentication(options =>
 {
@@ -52,41 +48,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 
 
-builder.Services.AddAzureClients(factory =>
 
-{
-
-    factory.AddSecretClient
-
-    (builder.Configuration.GetSection("KeyVault"));
-
-});
-SecretClient secretClient =
-
-builder.Services.BuildServiceProvider().GetService<SecretClient>();
-
-KeyVaultSecret secret =await secretClient.GetSecretAsync("secretoStorageAccount");
-
-string azurKeys = secret.Value;
-
-//string azurKeys = builder.Configuration.GetValue<string>("AzureKeys:StorageAccount");
-BlobServiceClient blobServiceClient= new BlobServiceClient(azurKeys);
-builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
-
-
-SecretClient secretredis =
-
-builder.Services.BuildServiceProvider().GetService<SecretClient>();
-
-KeyVaultSecret secretClientRedis = await secretClient.GetSecretAsync("secretoRedis");
-
-string cacheRedisKeys = secretClientRedis.Value;
-//string cacheRedisKeys = builder.Configuration.GetValue<string>("AzureKeys:CacheRedis");
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = cacheRedisKeys;
-});
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

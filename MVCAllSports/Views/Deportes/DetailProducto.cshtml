@@ -2,7 +2,7 @@
 @{
     Producto producto = ViewData["Producto"] as Producto;
     List<int> idsproductos = Context.Session.GetObject<List<int>>("IDSPRODUCTOS");
-    string rutaContainer = ViewData["RutaContainer"] as string;
+    string UrlBucket = keysModel.BucketUrl;
 }
 @section Scripts {
     <script>
@@ -46,7 +46,7 @@
 {
     <div class="row">
         <div class="col-md-4">
-            <img src="@rutaContainer/@producto.Imagen" class="w-100" />
+            <img src="@UrlBucket@producto.Imagen" class="w-100" />
         </div>
         <div class="col-md-8">
             <h2>Información del Producto</h2>

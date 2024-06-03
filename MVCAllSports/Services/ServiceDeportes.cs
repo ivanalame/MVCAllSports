@@ -9,11 +9,11 @@ using System.Text.RegularExpressions;
 using System;
 using Newtonsoft.Json.Linq;
 using AllSports.Helpers;
-using Azure.Storage.Blobs;
+//using Azure.Storage.Blobs;
 using StackExchange.Redis;
 using MVCAllSports.Helpers;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
+
+//using Azure.Security.KeyVault.Secrets;
 
 namespace MVCAllSports.Services
 {
@@ -21,26 +21,20 @@ namespace MVCAllSports.Services
     {
         private string UrlApi;
         private MediaTypeWithQualityHeaderValue header;
-        //private HelperCryptography helper;
+  
         private IDatabase database;
-        private BlobServiceClient client;
+     
         private IHttpContextAccessor httpContextAccessor;
 
-        public ServiceDeportes(IConfiguration configuration, IHttpContextAccessor httpContextAccessor,/*HelperCryptography helper*/ BlobServiceClient client)
+        public ServiceDeportes(IConfiguration configuration, IHttpContextAccessor httpContextAccessor,KeysModel keys)
         {
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
-            this.UrlApi = configuration.GetValue<string>("ApiUrls:ApiAllSports");
-            //this.helper = helper;
+            this.UrlApi = keys.ApiAllSports;
+           
             this.httpContextAccessor = httpContextAccessor;
-            this.client = client;
+          
             this.database = HelperCacheMultiplexer.Connection.GetDatabase();
 
-            //var apiUrlsConfig = configuration.GetSection("KeyVault");
-            //var keyVaultUrl = apiUrlsConfig.GetValue<string>("VaultUri");
-            //var secretClient = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
-            //var secretName = "secretoUrlApi";
-            //KeyVaultSecret secret = secretClient.GetSecret(secretName);
-            //this.UrlApi = secret.Value;
         }
 
         private async Task<T> CallApiAsync<T>(string request)
@@ -467,11 +461,11 @@ namespace MVCAllSports.Services
 
         #region AZURE
         //METODO PARA OBTENER LA RUTA DE MI CONTAINER
-        public async Task<string> GetContainerPathAsync()
-        {
-            BlobContainerClient containerClient = this.client.GetBlobContainerClient("allsports");
-            return containerClient.Uri.ToString();
-        }
+        //public async Task<string> GetContainerPathAsync()
+        //{
+        //    BlobContainerClient containerClient = this.client.GetBlobContainerClient("allsports");
+        //    return containerClient.Uri.ToString();
+        //}
         #endregion
         #region CACHE REDIS
         //METODO PARA ALMACENAR EN EL CARRO LOS PRODUCTOS

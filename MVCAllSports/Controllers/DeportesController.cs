@@ -1,7 +1,6 @@
 ﻿using AllSports.Extensions;
 using AllSports.Helpers;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
+
 using Microsoft.AspNetCore.Mvc;
 using MVCAllSports.Filters;
 using MVCAllSports.Models;
@@ -17,15 +16,15 @@ namespace MVCAllSports.Controllers
         private ServiceStorageAWS serviceStorage;
         private ServiceAWSCache serviceCache;
         private HelperMails helperMail;
-        //private HelperUploadFiles helperUploadFiles;
-        private TelemetryClient telemetryClient;
+       
+      
 
-        public DeportesController(ServiceDeportes service,HelperMails helperMails,/*HelperUploadFiles helperUploadFiles,*/TelemetryClient telemetryClient,ServiceStorageAWS serviceStorage,ServiceAWSCache serviceAWSCache)
+        public DeportesController(ServiceDeportes service,HelperMails helperMails,ServiceStorageAWS serviceStorage,ServiceAWSCache serviceAWSCache)
         {
             this.service = service;
-            this.telemetryClient = telemetryClient;
+         
             this.helperMail = helperMails;
-            // this.helperUploadFiles = helperUploadFiles;
+         
             this.serviceCache = serviceAWSCache;
             this.serviceStorage = serviceStorage;
         }
@@ -76,8 +75,8 @@ namespace MVCAllSports.Controllers
                 Usuario user = await this.service.GetPerfilUsuarioAsync();
                 ViewData["USERROLE"] = user.IdRolUsuario;
             }
-            string rutaContainerAzure = await this.service.GetContainerPathAsync();
-            ViewData["RutaContainer"] = rutaContainerAzure;
+            //string rutaContainerAzure = await this.service.GetContainerPathAsync();
+            //ViewData["RutaContainer"] = rutaContainerAzure;
 
             List<Deporte> deportes =  await service.GetDeportesAsync();
             //List<Nutricion> nutricion = await service.GetNutricionAsync();
@@ -145,8 +144,8 @@ namespace MVCAllSports.Controllers
                 Usuario user = await this.service.GetPerfilUsuarioAsync();
                 ViewData["USERROLE"] = user.IdRolUsuario;
             }
-            string rutaContainerAzure = await this.service.GetContainerPathAsync();
-            ViewData["RutaContainer"] = rutaContainerAzure;
+            //string rutaContainerAzure = await this.service.GetContainerPathAsync();
+            //ViewData["RutaContainer"] = rutaContainerAzure;
 
             List<Producto> Productos =await this.service.GetProductosByIdCategoriaAsyncAsync(IdCategoriaProducto);
             return View(Productos);
@@ -220,8 +219,8 @@ namespace MVCAllSports.Controllers
             List<ValoracionConNombreUsuario> Valoraciones = await this.service.GetValoracionById(IdProducto);
             Producto producto = await this.service.GetProductoByIdAsync(IdProducto);
             ViewData["Producto"] = producto;
-            string rutaContainerAzure = await this.service.GetContainerPathAsync();
-            ViewData["RutaContainer"] = rutaContainerAzure;
+            //string rutaContainerAzure = await this.service.GetContainerPathAsync();
+            //ViewData["RutaContainer"] = rutaContainerAzure;
 
             return View(Valoraciones);
         }
@@ -239,8 +238,8 @@ namespace MVCAllSports.Controllers
           
             Producto producto = await this.service.GetProductoByIdAsync(id);
             ViewData["MENSAJECOMPRA"] = "Compra Realizada";
-            string rutaContainerAzure = await this.service.GetContainerPathAsync();
-            ViewData["RutaContainer"] = rutaContainerAzure;
+            //string rutaContainerAzure = await this.service.GetContainerPathAsync();
+            //ViewData["RutaContainer"] = rutaContainerAzure;
             return View(producto);
         }
         [HttpPost]
@@ -260,13 +259,13 @@ namespace MVCAllSports.Controllers
             HttpContext.Session.SetString("IDPRODUCTOCOMPRADO", compra.IdProducto.ToString());
             ViewData["MENSAJECOMPRA"] = "Compra Realizada";
 
-            //EVENTO PARA GUARDAR DATOS (APPLICATION INSIGHTS)
-            this.telemetryClient.TrackEvent("CompraRequest");
-            MetricTelemetry metric = new MetricTelemetry();
-            metric.Name = "Compra";
-            metric.Sum = compra.Cantidad;
-            metric.Properties.Add("FechaCompra", compra.FechaCompra.ToString());
-            metric.Properties.Add("MetodoPago", compra.Metodo_Pago);
+            ////EVENTO PARA GUARDAR DATOS (APPLICATION INSIGHTS)
+            //this.telemetryClient.TrackEvent("CompraRequest");
+            //MetricTelemetry metric = new MetricTelemetry();
+            //metric.Name = "Compra";
+            //metric.Sum = compra.Cantidad;
+            //metric.Properties.Add("FechaCompra", compra.FechaCompra.ToString());
+            //metric.Properties.Add("MetodoPago", compra.Metodo_Pago);
 
 
             return RedirectToAction("index");
@@ -373,8 +372,8 @@ namespace MVCAllSports.Controllers
         [AuthorizeUsuarios]
         public async Task<IActionResult> DetalleMisCompras(int? idProducto)
         {
-            string rutaContainerAzure = await this.service.GetContainerPathAsync();
-            ViewData["RutaContainer"] = rutaContainerAzure;
+            //string rutaContainerAzure = await this.service.GetContainerPathAsync();
+            //ViewData["RutaContainer"] = rutaContainerAzure;
             Producto producto = await this.service.GetProductoByIdAsync(idProducto.Value);
             return View(producto);
         }

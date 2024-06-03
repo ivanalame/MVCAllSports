@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "_DetalleMisCompras";
-    string rutaContainer = ViewData["RutaContainer"] as string;
+    string UrlBucket = keysModel.BucketUrl;
 }
 
 <style>
@@ -48,7 +48,7 @@
                     <h2 class="card-title text-center mb-4">Detalle de la Compra</h2>
                     <div class="row">
                         <div class="col-md-5">
-                            <img src="@rutaContainer/@Model.Imagen" alt="Imagen del producto" class="img-fluid product-img">
+                            <img src="@UrlBucket@Model.Imagen" alt="Imagen del producto" class="img-fluid product-img">
                         </div>
                         <div class="col-md-7 product-info">
                             <h4 class="mb-3">@Model.Nombre</h4>
