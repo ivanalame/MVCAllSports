@@ -13,8 +13,6 @@ builder.Services.AddControllersWithViews(options => options.EnableEndpointRoutin
 builder.Services.AddSession();
 
 builder.Services.AddSingleton<HelperMails>();
-builder.Services.AddSingleton<HelperCacheMultiplexer>();
-
 
 builder.Services.AddTransient<ServiceDeportes>();
 builder.Services.AddAuthentication(options =>
